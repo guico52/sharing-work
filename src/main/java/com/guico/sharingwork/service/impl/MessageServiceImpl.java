@@ -36,8 +36,105 @@ public class MessageServiceImpl implements IMessageService {
     }
 
     @Override
-    public void process(String gridKey, JSONObject message) {
+    public void process(String wbId, JSONObject message) {
+        //获取操作名
+        String action = message.getStr("t");
+        //获取sheet的index值
+        String index = message.getStr("i");
 
+        //如果是复制sheet，index的值需要另取
+        if ("shc".equals(action)) {
+            index = message.getJSONObject("v").getStr("copyindex");
+        }
+
+        //如果是删除sheet，index的值需要另取
+        if ("shd".equals(action)) {
+            index = message.getJSONObject("v").getStr("deleIndex");
+        }
+
+        //如果是恢复sheet，index的值需要另取
+        if ("shre".equals(action)) {
+            index = message.getJSONObject("v").getStr("reIndex");
+        }
+
+        WorkSheetEntity ws = workSheetRepository.findByindexAndwbId(index, wbId);
+
+        switch (action) {
+            //单个单元格刷新
+            case "v":
+                ws = singleCellRefresh(ws, message);
+                break;
+            //范围单元格刷新
+            case "rv":
+                ws = rangeCellRefresh(ws, message);
+                break;
+            //config操作
+            case "cg":
+                ws = configRefresh(ws, message);
+                break;
+            //通用保存
+            case "all":
+                ws = allRefresh(ws, message);
+                break;
+            //函数链操作
+            case "fc":
+                ws = calcChainRefresh(ws, message);
+                break;
+            //删除行或列
+            case "drc":
+                ws = drcRefresh(ws, message);
+                break;
+            //增加行或列
+            case "arc":
+                ws = arcRefresh(ws, message);
+                break;
+            //清除筛选
+            case "fsc":
+                ws = fscRefresh(ws, message);
+                break;
+            //恢复筛选
+            case "fsr":
+                ws = fscRefresh(ws, message);
+                break;
+            //新建sheet
+            case "sha":
+                ws = shaRefresh(wbId, message);
+                break;
+            //切换到指定sheet
+            case "shs":
+                shsRefresh(wbId, message);
+                break;
+            //复制sheet
+            case "shc":
+                ws = shcRefresh(ws, message);
+                break;
+            //修改工作簿名称
+            case "na":
+                naRefresh(wbId, message);
+                break;
+            //删除sheet
+            case "shd":
+                ws.setDeleteStatus(1);
+                break;
+            //删除sheet后恢复操作
+            case "shre":
+                ws.setDeleteStatus(0);
+                break;
+            //调整sheet位置
+            case "shr":
+                shrRefresh(wbId, message);
+                break;
+            //sheet属性(隐藏或显示)
+            case "sh":
+                ws = shRefresh(ws, message);
+                break;
+            default:
+                break;
+        }
+        if (ObjectUtil.isNull(ws)) {
+            return;
+        }
+        workSheetRepository.save(ws);
     }
 
 
