@@ -1,0 +1,8 @@
+spring:
+  data:
+    redis:
+      host: guico.top
+      password: 411326li?
+    mongodb:
+      uri: mongodb://localhost:27017/wb?readPreference=primary&ssl=false
+      database: wb
