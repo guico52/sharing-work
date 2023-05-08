@@ -1,3 +1,4 @@
+
 spring:
   data:
     redis:
@@ -6,3 +7,5 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/wb?readPreference=primary&ssl=false
       database: wb
+server:
+  port: 9909

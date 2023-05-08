@@ -90,9 +90,7 @@ public class MessageServiceImpl implements IMessageService {
                 break;
             //清除筛选
             case "fsc":
-                ws = fscRefresh(ws, message);
-                break;
-            //恢复筛选
+                //恢复筛选
             case "fsr":
                 ws = fscRefresh(ws, message);
                 break;
